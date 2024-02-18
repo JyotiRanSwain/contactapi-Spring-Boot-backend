@@ -1,0 +1,30 @@
+version: "2"
+
+services:
+  postgresqldb:
+    image: postgres:latest
+    networks:
+      - springpostgres-net
+    environment:
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=securepassword
+      - POSTGRES_DB=testdatabase
+
+  spring-backend:
+    image: spring-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgresqldb:5432/testdatabase
+      - spring.datasource.username=postgresuser
+      - spring.datasource.password=securepassword
+    networks:
+      - springpostgres-net
+    depends_on:
+      - postgresqldb
+
+networks:
+  springpostgres-net:
